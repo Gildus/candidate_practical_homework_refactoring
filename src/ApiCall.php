@@ -71,24 +71,19 @@ class ApiCall
 
 	public static function call($target, $mode, $getParameters, $postParameters)
 	{
-		if (!isset($getParameters['action']))
-		{
+		if (!isset($getParameters['action'])) {
 			return;
 		}
 
-		switch ($getParameters['action'])
-		{
+		switch ($getParameters['action']) {
 			case 'getLanguageFile':
 				return self::formatAsResult(self::GET_LANGUAGE_FILE_RESULT);
-				break;
 
 			case 'getAppletLanguages':
 				return self::formatAsResult(['en']);
-				break;
 
 			case 'getAppletLanguageFile':
 				return self::formatAsResult(self::GET_APPLET_LANGUAGE_FILE_RESULT);
-				break;
 		}
 	}
 
