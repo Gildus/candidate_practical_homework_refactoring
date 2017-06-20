@@ -12,7 +12,7 @@ class LanguageBatchBo
 	 *
 	 * @var array
 	 */
-	protected static $applications = array();
+	protected static $applications = [];
 
 	/**
 	 * Starts the language file generation.
@@ -31,8 +31,7 @@ class LanguageBatchBo
 				echo "\t[LANGUAGE: " . $language . "]";
 				if (self::getLanguageFile($application, $language)) {
 					echo " OK\n";
-				}
-				else {
+				} else {
 					throw new \Exception('Unable to generate language file!');
 				}
 			}
@@ -45,41 +44,30 @@ class LanguageBatchBo
 	 * @param string $application   The name of the application.
 	 * @param string $language      The identifier of the language.
 	 *
-	 * @throws CurlException   If there was an error during the download of the language file.
+	 * @throws Exception   If there was an error during the download of the language file.
 	 *
 	 * @return bool   The success of the operation.
 	 */
 	protected static function getLanguageFile($application, $language)
 	{
-		$result = false;
-		$languageResponse = ApiCall::call(
-			'system_api',
-			'language_api',
-			array(
-				'system' => 'LanguageFiles',
-				'action' => 'getLanguageFile'
-			),
-			array('language' => $language)
-		);
+		$languageResponse = ApiCall::call('getLanguageFile');
 
 		try {
 			self::checkForApiErrorResult($languageResponse);
-		}
-		catch (\Exception $e) {
+		} catch (\Exception $e) {
 			throw new \Exception('Error during getting language file: (' . $application . '/' . $language . ')');
 		}
 
 		// If we got correct data we store it.
 		$destination = self::getLanguageCachePath($application) . $language . '.php';
 		// If there is no folder yet, we'll create it.
-		var_dump($destination);
 		if (!is_dir(dirname($destination))) {
 			mkdir(dirname($destination), 0755, true);
 		}
 
-		$result = file_put_contents($destination, $languageResponse['data']);
+		$result = (file_put_contents($destination, $languageResponse['data']) !== FALSE);
 
-		return (bool)$result;
+		return $result;
 	}
 
 	/**
@@ -104,9 +92,9 @@ class LanguageBatchBo
 	public static function generateAppletLanguageXmlFiles()
 	{
 		// List of the applets [directory => applet_id].
-		$applets = array(
+		$applets = [
 			'memberapplet' => 'JSM2_MemberApplet',
-		);
+		];
 
 		echo "\nGetting applet language XMLs..\n";
 
@@ -115,8 +103,7 @@ class LanguageBatchBo
 			$languages = self::getAppletLanguages($appletLanguageId);
 			if (empty($languages)) {
 				throw new \Exception('There is no available languages for the ' . $appletLanguageId . ' applet.');
-			}
-			else {
+			} else {
 				echo ' - Available languages: ' . implode(', ', $languages) . "\n";
 			}
 			$path = Config::get('system.paths.root') . '/cache/flash';
@@ -125,8 +112,7 @@ class LanguageBatchBo
 				$xmlFile    = $path . '/lang_' . $language . '.xml';
 				if (strlen($xmlContent) == file_put_contents($xmlFile, $xmlContent)) {
 					echo " OK saving $xmlFile was successful.\n";
-				}
-				else {
+				} else {
 					throw new \Exception('Unable to save applet: (' . $appletLanguageId . ') language: (' . $language
 						. ') xml (' . $xmlFile . ')!');
 				}
@@ -146,20 +132,11 @@ class LanguageBatchBo
 	 */
 	protected static function getAppletLanguages($applet)
 	{
-		$result = ApiCall::call(
-			'system_api',
-			'language_api',
-			array(
-				'system' => 'LanguageFiles',
-				'action' => 'getAppletLanguages'
-			),
-			array('applet' => $applet)
-		);
+		$result = ApiCall::call('getAppletLanguages');
 
 		try {
 			self::checkForApiErrorResult($result);
-		}
-		catch (\Exception $e) {
+		} catch (\Exception $e) {
 			throw new \Exception('Getting languages for applet (' . $applet . ') was unsuccessful ' . $e->getMessage());
 		}
 
@@ -177,23 +154,11 @@ class LanguageBatchBo
 	 */
 	protected static function getAppletLanguageFile($applet, $language)
 	{
-		$result = ApiCall::call(
-			'system_api',
-			'language_api',
-			array(
-				'system' => 'LanguageFiles',
-				'action' => 'getAppletLanguageFile'
-			),
-			array(
-				'applet' => $applet,
-				'language' => $language
-			)
-		);
+		$result = ApiCall::call('getAppletLanguageFile');
 
 		try {
 			self::checkForApiErrorResult($result);
-		}
-		catch (\Exception $e) {
+		} catch (\Exception $e) {
 			throw new \Exception('Getting language xml for applet: (' . $applet . ') on language: (' . $language . ') was unsuccessful: '
 				. $e->getMessage());
 		}

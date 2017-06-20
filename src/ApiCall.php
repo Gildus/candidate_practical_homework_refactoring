@@ -69,13 +69,9 @@ class ApiCall
 			<info_personalinfo value="Modell adatlap"/>
 		</data>';
 
-	public static function call($target, $mode, $getParameters, $postParameters)
+	public static function call($action)
 	{
-		if (!isset($getParameters['action'])) {
-			return;
-		}
-
-		switch ($getParameters['action']) {
+		switch ($action) {
 			case 'getLanguageFile':
 				return self::formatAsResult(self::GET_LANGUAGE_FILE_RESULT);
 
